@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import androidx.appcompat.app.AlertDialog;
 public class EditNoteActivity extends AppCompatActivity {
 
     private EditText etTitle, etContent;
@@ -41,11 +42,19 @@ public class EditNoteActivity extends AppCompatActivity {
         }
         btnDelete.setOnClickListener(v -> {
             if (existingNote != null) {
-                repository.deleteNote(existingNote.getId());
-                Toast.makeText(this, "笔记已删除", Toast.LENGTH_SHORT).show();
-                finish(); // 关闭当前页面，返回主界面
+                // 弹出确认删除对话框
+                new AlertDialog.Builder(this)
+                        .setTitle("删除笔记")
+                        .setMessage("确定要删除《" + existingNote.getTitle() + "》吗？")
+                        .setPositiveButton("删除", (dialog, which) -> {
+                            repository.deleteNote(existingNote.getId());
+                            Toast.makeText(this, "笔记已删除", Toast.LENGTH_SHORT).show();
+                            finish();
+                        })
+                        .setNegativeButton("取消", null)
+                        .show();
             } else {
-                // 如果是新建笔记尚未保存，直接返回
+                // 新建未保存的笔记，直接关闭页面
                 finish();
             }
         });
